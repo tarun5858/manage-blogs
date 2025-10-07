@@ -20,6 +20,7 @@ function App() {
             }
           />
           {/* <Manageblogs /> */}
+           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
