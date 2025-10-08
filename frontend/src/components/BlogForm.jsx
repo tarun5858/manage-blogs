@@ -14,6 +14,13 @@ function BlogForm() {
     blogTags: "",
     imageKey: "",
     detailImageKey: "",
+    imagePositions: [
+      {
+        section: "",
+        imageKey: "",
+        position: "",
+      },
+    ],
     paragraph1: "",
     outcome: "",
     lesson: "",
@@ -71,16 +78,37 @@ function BlogForm() {
     setBlog({ ...blog, [headKey]: updated });
   };
 
-// Add a benefit to a specific section and name index
-const addBenefitToName = (headKey, sectionIndex, nameIndex) => {
-  const updated = [...blog[headKey]]; // copy the specific subtitle head array
-  if (!updated[sectionIndex].benefits) updated[sectionIndex].benefits = [];
-  
-  // Make sure we have a benefits array corresponding to the nameIndex
-  updated[sectionIndex].benefits.push(""); // adds an empty benefit input
-  setBlog({ ...blog, [headKey]: updated });
-};
+  // ✅ Add a benefit to a specific section and name index
+  // const addBenefitToName = (headKey, sectionIndex, nameIndex) => {
+  //   const updated = [...blog[headKey]];
+  //   if (!updated[sectionIndex].benefits) updated[sectionIndex].benefits = [];
+  //   updated[sectionIndex].benefits.push("");
+  //   setBlog({ ...blog, [headKey]: updated });
+  // };
 
+  // ✅ Handle imagePositions change
+  const handleImagePositionChange = (index, field, value) => {
+    const updated = [...blog.imagePositions];
+    updated[index][field] = value;
+    setBlog({ ...blog, imagePositions: updated });
+  };
+
+  // ✅ Add new imagePosition row
+  // const addImagePosition = () => {
+  //   setBlog({
+  //     ...blog,
+  //     imagePositions: [
+  //       ...blog.imagePositions,
+  //       { section: "", imageKey: "", position: "" },
+  //     ],
+  //   });
+  // };
+
+  // ✅ Remove imagePosition row
+  // const removeImagePosition = (index) => {
+  //   const updated = blog.imagePositions.filter((_, i) => i !== index);
+  //   setBlog({ ...blog, imagePositions: updated });
+  // };
 
   // ✅ Submit form to backend
   const handleSubmit = async (e) => {
@@ -92,11 +120,22 @@ const addBenefitToName = (headKey, sectionIndex, nameIndex) => {
       points: blog.points.split(",").map((t) => t.trim()).filter(Boolean),
     };
 
-    const res = await fetch("http://localhost:4000/api/blogs/manual", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    // const res = await fetch("http://localhost:4000/api/blogs/manual", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(payload),
+    // });
+    
+    
+    const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+
+const res = await fetch(`${API_BASE_URL}/api/blogs/manual`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload),
+});
+
 
     if (res.ok) {
       alert("✅ Blog added successfully!");
@@ -136,7 +175,53 @@ const addBenefitToName = (headKey, sectionIndex, nameIndex) => {
         </div>
       ))}
 
-      {/* ✅ Subtitle + SubttileHead Sections */}
+{/* Image Positions Section */}
+      <div style={{ marginTop: "30px" }}>
+        <h3>Image Positions</h3>
+
+        {blog.imagePositions.map((pos, index) => (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <input
+              placeholder="Section (e.g., subtitle1)"
+              value={pos.section}
+              onChange={(e) =>
+                handleImagePositionChange(index, "section", e.target.value)
+              }
+            />
+            <input
+              placeholder="Image Key (e.g., blogDetail20)"
+              value={pos.imageKey}
+              onChange={(e) =>
+                handleImagePositionChange(index, "imageKey", e.target.value)
+              }
+            />
+            <select
+              value={pos.position}
+              onChange={(e) =>
+                handleImagePositionChange(index, "position", e.target.value)
+              }
+            >
+              <option value="">Select Position</option>
+              <option value="before">Before</option>
+              <option value="after">After</option>
+            </select>
+
+           
+          </div>
+        ))}
+
+       
+      </div>
+
+      {/*Subtitle + SubttileHead Sections */}
       {["subtitle","subtitle1","subtitle2","subtitle3","subtitle4","subtitle5","subtitle6"].map((subField, idx) => {
         const headField = `subttileHead${idx === 0 ? "" : idx}`;
         const subtitleArray = blog[headField] || [];
@@ -229,10 +314,11 @@ const addBenefitToName = (headKey, sectionIndex, nameIndex) => {
             >
               + Add New Section
             </button>
-            
           </div>
         );
       })}
+
+      
 
       {/* ✅ Save Blog */}
       <button
