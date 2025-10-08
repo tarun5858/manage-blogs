@@ -13,16 +13,47 @@ import jwt from "jsonwebtoken";
 
 import Blog from "./models/Blog.js"; // make sure models/Blog.js exists
 
+
 const app = express();
-app.use(cors());
+
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://manage-blogs.onrender.com",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ CORS blocked for origin:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+
 app.use(express.json({ limit: "5mb" })); // increase if needed
 
 // env
+// const PORT = process.env.PORT || 4000;
+// const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://prehome_website_user:1ywa7PfsUW3pPWvt@lead-tracking.jysawuj.mongodb.net/dynamic-website-blogs?retryWrites=true&w=majority&appName=lead-tracking";
+// const JWT_SECRET = process.env.JWT_SECRET || "mySuperSecretKey";
+// const ADMIN_USER = process.env.ADMIN_USER || "admin";
+// const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
+
 const PORT = process.env.PORT || 4000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://prehome_website_user:1ywa7PfsUW3pPWvt@lead-tracking.jysawuj.mongodb.net/dynamic-website-blogs?retryWrites=true&w=majority&appName=lead-tracking";
-const JWT_SECRET = process.env.JWT_SECRET || "mySuperSecretKey";
-const ADMIN_USER = process.env.ADMIN_USER || "admin";
-const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
+const MONGO_URI = process.env.MONGO_URI;
+const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_USER = process.env.ADMIN_USER;
+const ADMIN_PASS = process.env.ADMIN_PASS;
+
 
 // Ensure uploads folder exists (for CSV)
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -261,13 +292,29 @@ app.post("/api/upload", authenticateToken, upload.single("csv"), (req, res) => {
 });
 
 // Simple login endpoint to get JWT (admin)
+// app.post("/api/login", (req, res) => {
+//   const { username, password } = req.body;
+//   if (username === ADMIN_USER && password === ADMIN_PASS) {
+//     const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: "6h" });
+//     return res.json({ token });
+//   }
+//   res.status(401).json({ error: "Invalid credentials" });
+// });
+
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
-    const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: "6h" });
-    return res.json({ token });
+
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: "Username and password required" });
   }
-  res.status(401).json({ error: "Invalid credentials" });
+
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
+    // Create JWT token
+    const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: "1h" });
+    return res.json({ success: true, token });
+  }
+
+  return res.status(401).json({ success: false, message: "Invalid credentials" });
 });
 
 // Example protected test route
