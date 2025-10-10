@@ -126,6 +126,8 @@ if (!MONGO_URI) {
   console.error("MONGO_URI not set. Please configure .env or environment variables.");
   process.exit(1);
 }
+console.log("🔍 MONGO_URI is:", process.env.MONGO_URI);
+
 mongoose
   .connect(MONGO_URI, {
     useNewUrlParser: true,
