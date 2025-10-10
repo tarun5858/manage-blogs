@@ -19,11 +19,12 @@ function Login() {
         body: JSON.stringify({ username, password }),
       });
 
-      console.log("Status:", res.status);
-const text = await res.text(); // get raw text
-console.log("Response text:", text);
+      
+// const text = await res.text(); // get raw text
 
+console.log("Status:", res.status);
       const data = await res.json();
+console.log("Response text:", data);
 
       if (res.ok && data.success) {
         // Save token in context
