@@ -111,6 +111,8 @@ function BlogForm() {
   // };
 
   // ✅ Submit form to backend
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -127,11 +129,8 @@ function BlogForm() {
     // });
     
     
-    const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
-
-// const res = await fetch(`${API_BASE_URL}/api/blogs/manual`, {
-const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blogs/manual`, {
+const res = await fetch(`${API_BASE_URL}/api/blogs/manual`, {
+// const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blogs/manual`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload),
