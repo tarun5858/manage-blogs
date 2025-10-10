@@ -12,12 +12,16 @@ function Login() {
     e.preventDefault();
 
     try {
-      // const res = await fetch("https://dynamic-blog-server-g5ea.onrender.com/api/login", {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
+      const res = await fetch("https://dynamic-blog-server-g5ea.onrender.com/api/login", {
+      // const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
+
+      console.log("Status:", res.status);
+const text = await res.text(); // get raw text
+console.log("Response text:", text);
 
       const data = await res.json();
 
